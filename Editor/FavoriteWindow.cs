@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using Cysharp.Threading.Tasks;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -8,9 +10,10 @@ namespace SmartFavorites
 {
     public class FavoriteWindow : EditorWindow
     {
-        private const double LastObjectSelectedTickOpen = 0.5f;
-        private const double LastObjectSelectedTickPing = 2f;
-        
+        [Range(10, 100)] private const float ItemHeight = 55f;
+        private const float LastObjectSelectedTickOpen = 0.5f;
+        private const float LastObjectSelectedTickPing = 2f;
+
         private static FavoriteWindow _favoriteWindow;
         private static FavoriteSave _favoriteSave;
         private static FavoriteSave FavoriteSave {
@@ -82,7 +85,7 @@ namespace SmartFavorites
 
         public void OnGUI()
         {
-            reorderableList.elementHeight = FavoriteSave.ListHeight;
+            reorderableList.elementHeight = ItemHeight;
 
             if (!guiStyleDefined)
             {
@@ -150,9 +153,13 @@ namespace SmartFavorites
             {
                 case EventType.DragUpdated when mouseOnWindow:
                 {
-                    //bool isValid = DragAndDrop.objectReferences.Select(GlobalObjectId.GetGlobalObjectIdSlow).All(obj => !FavoriteSave.CurrentList.Contains(obj));
-                    DragAndDrop.visualMode = DragAndDrop.objectReferences.Length > 0 ?
-                        DragAndDropVisualMode.Copy : DragAndDropVisualMode.Rejected;
+                    if (DragAndDrop.objectReferences.Length != 0)
+                    {
+                        bool isValid = DragAndDrop.objectReferences.Select(GlobalObjectId.GetGlobalObjectIdSlow).Any(obj => !FavoriteSave.CurrentList.Contains(obj));
+                        DragAndDrop.visualMode = isValid ? DragAndDropVisualMode.Copy : DragAndDropVisualMode.Rejected;
+                    }
+                    else
+                        DragAndDrop.visualMode = DragAndDropVisualMode.Rejected;
                     break;
                 }
                 case EventType.DragPerform when mouseOnWindow:

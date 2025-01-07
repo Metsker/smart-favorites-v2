@@ -21,8 +21,7 @@ namespace SmartFavorites
 
         public int FavoriteListsCount => favoriteLists.Count;
         public FavoriteList CurrentList => favoriteLists[CurrentListIndex];
-
-        [field: SerializeField][Range(10, 100)] public float ListHeight { get; private set; } = 55f;
+        
         [SerializeField] private List<FavoriteList> favoriteLists;
 
         private int _currentListIndex;
