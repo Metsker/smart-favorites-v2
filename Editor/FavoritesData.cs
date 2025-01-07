@@ -5,8 +5,16 @@ using UnityEngine;
 
 namespace SmartFavorites
 {
-    public class FavoriteSave : ScriptableObject
+    public class FavoritesData : ScriptableObject
     {
+        [Range(10, 100)] public float itemHeight = 55f;
+        [Range(5, 15)] public int fontSize = 10;
+        [Space]
+        public float lastObjectSelectedTickOpen = 0.5f;
+        public float lastObjectSelectedTickPing = 2f;
+        [Space]
+        [SerializeField] private List<FavoritesList> favoriteLists;
+        
         public int CurrentListIndex 
         {
             get => _currentListIndex;
@@ -18,18 +26,15 @@ namespace SmartFavorites
                 _currentListIndex = value;
             }
         }
-
         public int FavoriteListsCount => favoriteLists.Count;
-        public FavoriteList CurrentList => favoriteLists[CurrentListIndex];
+        public FavoritesList CurrentList => favoriteLists[CurrentListIndex];
         
-        [SerializeField] private List<FavoriteList> favoriteLists;
-
         private int _currentListIndex;
         public event Action CurrentIndexChanged;
 
-        public FavoriteSave()
+        public FavoritesData()
         {
-            favoriteLists = new List<FavoriteList>();
+            favoriteLists = new List<FavoritesList>();
             AddList();
         }
 
@@ -43,7 +48,7 @@ namespace SmartFavorites
                     listName = "Favorites " + (i + 1);
             }
 
-            favoriteLists.Add(new FavoriteList(listName));
+            favoriteLists.Add(new FavoritesList(listName));
             CurrentListIndex = favoriteLists.Count - 1;
         }
 

@@ -7,12 +7,12 @@ using Object = UnityEngine.Object;
 namespace SmartFavorites
 {
     [Serializable]
-    public class FavoriteList
+    public class FavoritesList
     {
         public string name;
         public List<string> serializedIds;
         
-        public FavoriteList(string name)
+        public FavoritesList(string name)
         {
             this.name = name;
             serializedIds = new List<string>();
