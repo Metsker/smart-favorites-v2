@@ -1,6 +1,6 @@
 # Smart Favorites v2 for Unity
 
-A favorites panel for Unity for better asset management in your project
+A favorites panel for better asset management in your project
 
 ![Favorites Panel for Unity](https://github.com/user-attachments/assets/698b82d5-dcdb-4b2d-89d2-0decb2e1286d)
 
