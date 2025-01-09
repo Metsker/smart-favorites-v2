@@ -4,15 +4,29 @@ A favorites panel for Unity to list all your favorites assets in your project
 
 ![Favorites Panel for Unity](https://github.com/user-attachments/assets/698b82d5-dcdb-4b2d-89d2-0decb2e1286d)
 
+## Features
+
+- Supports custom categories
+- Works with both project and scene assets
+- Shows asset previews
+- Supports item reordering
+- Supports multiselect (for removing items from the list)
+
 ## Installation
 
-Import the [last package](https://github.com/nicoplv/smart-favorites/releases) on your project and that's all!
+Import the [last package](https://github.com/Metsker/smart-favorites-v2/releases) to your project
 
 ## Usage
 
 - Open the window with Window >> Favorites
+- "FavoritesData" asset will be created at the project root, it contains plugin's settings and save data, you can change it's location freely
 - Add a favorites list with the +
 - Remove a favorites list with the -
-- Rename a favorites list with the pen icon at the right on the name
-- Switch to an other list by clicking on the current list name
-- Drag-and-drop an item to add it or remove it from the current favorites list
+- Rename a favorites list with the pen icon at the right of the name
+- Switch to an other list by clicking on the current list name, or with arrow buttons
+- Drag-and-drop any asset to the window to add it to the current favorites list
+- Single click the list item to ping it, Double click to focus it, or Drag-and-drop it away from the window to add it to the current context, if it's valid
+
+## Known issues
+
+- Rearrange of the categories is currently possible only through the "FavoritesData" asset 
