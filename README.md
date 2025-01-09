@@ -29,4 +29,4 @@ Import the [last package](https://github.com/Metsker/smart-favorites-v2/releases
 
 ## Known issues
 
-- Rearrange of the categories is currently possible only through the "FavoritesData" asset 
+- Rearrangement of the categories is currently possible only through the "FavoritesData" asset 
