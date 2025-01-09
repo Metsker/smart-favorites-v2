@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -31,7 +30,6 @@ namespace SmartFavorites
         private GUIStyle toolbarIconButtonGuiStyle;
 
         private bool editNameList;
-        private Font _font;
         
         [MenuItem("Window/Favorites", priority = 1100)]
         public static void ShowWindow()
@@ -46,7 +44,6 @@ namespace SmartFavorites
             InitList();
             InitFavoriteSave();
             guiStyleDefined = false;
-            _font = Resources.Load<Font>("FontAwesome");
             FavoritesData.CurrentIndexChanged += OnSelectedChanged;
         }
 
@@ -80,18 +77,18 @@ namespace SmartFavorites
 
         public void OnGUI()
         {
-            reorderableList.elementHeight = FavoritesData.itemHeight;
+            reorderableList.elementHeight = FavoritesData.listItemHeight;
 
             if (!guiStyleDefined)
             {
-                guiStyleDefined = true;
                 reorderableListLabelGuiStyle = new GUIStyle(EditorStyles.label);
                 reorderableListLabelGuiStyle.focused.textColor = reorderableListLabelGuiStyle.normal.textColor;
                 toolbarIconButtonGuiStyle = new GUIStyle(EditorStyles.toolbarButton)
                 {
-                    font = _font,
-                    fontSize = FavoritesData.fontSize
+                    fontSize = FavoritesData.toolbarFontSize,
+                    font = EditorStyles.boldFont
                 };
+                guiStyleDefined = true;
             }
 
             GUILayout.BeginVertical();
@@ -137,17 +134,17 @@ namespace SmartFavorites
             }
 
             EditorGUI.BeginDisabledGroup(FavoritesData.FavoriteListsCount == 0);
-            if (GUILayout.Button("", toolbarIconButtonGuiStyle, GUILayout.ExpandWidth(false)))
+            if (GUILayout.Button("✎", toolbarIconButtonGuiStyle, GUILayout.ExpandWidth(false)))
                 ButtonEditFavoriteList();
             EditorGUI.EndDisabledGroup();
             
             EditorGUI.BeginDisabledGroup(editNameList);
-            if (GUILayout.Button("", toolbarIconButtonGuiStyle, GUILayout.ExpandWidth(false)))
+            if (GUILayout.Button("+", toolbarIconButtonGuiStyle, GUILayout.ExpandWidth(false)))
                 ButtonAddFavoriteList();
             EditorGUI.EndDisabledGroup();
             
             EditorGUI.BeginDisabledGroup(editNameList || FavoritesData.FavoriteListsCount == 0);
-            if (GUILayout.Button("", toolbarIconButtonGuiStyle, GUILayout.ExpandWidth(false)))
+            if (GUILayout.Button("-", toolbarIconButtonGuiStyle, GUILayout.ExpandWidth(false)))
                 ButtonRemoveFavoriteList();
             EditorGUI.EndDisabledGroup();
 

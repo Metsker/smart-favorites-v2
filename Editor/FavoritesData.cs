@@ -7,8 +7,9 @@ namespace SmartFavorites
 {
     public class FavoritesData : ScriptableObject
     {
-        [Range(10, 100)] public float itemHeight = 55f;
-        [Range(5, 15)] public int fontSize = 10;
+        [Range(10, 100)] public float listItemHeight = 55f;
+        [Tooltip("Recompile is required")]
+        [Range(5, 15)] public int toolbarFontSize = 11;
         [Space]
         public float lastObjectSelectedTickOpen = 0.5f;
         public float lastObjectSelectedTickPing = 2f;
@@ -52,6 +53,7 @@ namespace SmartFavorites
         {
             string listName = "Favorites 1";
             string[] names = ListNames();
+            
             for (int i = 1; i < favoriteLists.Count + 1; i++)
             {
                 if (names.Contains(listName))
@@ -71,12 +73,7 @@ namespace SmartFavorites
                 CurrentListIndex = favoriteLists.Count - 1;
         }
 
-        public string[] ListNames()
-        {
-            string[] nameList = new string[favoriteLists.Count];
-            for (int i = 0; i < favoriteLists.Count; i++)
-                nameList[i] = favoriteLists[i].name;
-            return nameList;
-        }
+        public string[] ListNames() =>
+            favoriteLists.Select(l => l.name).ToArray();
     }
 }
