@@ -27,8 +27,18 @@ namespace SmartFavorites
             }
         }
         public int FavoriteListsCount => favoriteLists.Count;
-        public FavoritesList CurrentList => favoriteLists[CurrentListIndex];
-        
+        public FavoritesList CurrentList {
+            get
+            {
+                if (_currentListIndex >= favoriteLists.Count)
+                    _currentListIndex = favoriteLists.Count - 1;
+                else if (_currentListIndex < 0)
+                    _currentListIndex = 0;
+                
+                return favoriteLists[CurrentListIndex];
+            }
+        }
+
         private int _currentListIndex;
         public event Action CurrentIndexChanged;
 
@@ -40,29 +50,28 @@ namespace SmartFavorites
 
         public void AddList()
         {
-            string listName = "Favorites";
-            string[] names = NameList();
-            for (int i = 0; i < favoriteLists.Count; i++)
+            string listName = "Favorites 1";
+            string[] names = ListNames();
+            for (int i = 1; i < favoriteLists.Count + 1; i++)
             {
                 if (names.Contains(listName))
                     listName = "Favorites " + (i + 1);
             }
-
+            
             favoriteLists.Add(new FavoritesList(listName));
+            
             CurrentListIndex = favoriteLists.Count - 1;
         }
 
         public void RemoveList(int index)
         {
-            if (favoriteLists.Count <= 1)
-                return;
-            
             favoriteLists.RemoveAt(index);
+            
             if (CurrentListIndex >= favoriteLists.Count)
-                CurrentListIndex--;
+                CurrentListIndex = favoriteLists.Count - 1;
         }
 
-        public string[] NameList()
+        public string[] ListNames()
         {
             string[] nameList = new string[favoriteLists.Count];
             for (int i = 0; i < favoriteLists.Count; i++)

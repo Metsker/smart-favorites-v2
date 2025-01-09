@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -10,7 +11,6 @@ namespace SmartFavorites
     public class FavoritesWindow : EditorWindow
     {
         private static FavoritesWindow _favoritesWindow;
-        private static FavoritesData _favoritesData;
         private static FavoritesData FavoritesData {
             get
             {
@@ -19,6 +19,7 @@ namespace SmartFavorites
                 return _favoritesData;
             }
         }
+        private static FavoritesData _favoritesData;
         private ReorderableList reorderableList;
         
         private Vector2 scrollViewPosition = Vector2.zero;
@@ -74,13 +75,12 @@ namespace SmartFavorites
 
         public void OnLostFocus()
         {
-            if (editNameList)
-                editNameList = false;
+            editNameList = false;
         }
 
         public void OnGUI()
         {
-            reorderableList.elementHeight = _favoritesData.itemHeight;
+            reorderableList.elementHeight = FavoritesData.itemHeight;
 
             if (!guiStyleDefined)
             {
@@ -90,7 +90,7 @@ namespace SmartFavorites
                 toolbarIconButtonGuiStyle = new GUIStyle(EditorStyles.toolbarButton)
                 {
                     font = _font,
-                    fontSize = _favoritesData.fontSize
+                    fontSize = FavoritesData.fontSize
                 };
             }
 
@@ -110,38 +110,57 @@ namespace SmartFavorites
             if (GUILayout.Button("➡", toolbarIconButtonGuiStyle, GUILayout.ExpandWidth(false)))
             {
                 FavoritesData.CurrentListIndex++;
-                if (_favoritesData.CurrentListIndex >= FavoritesData.FavoriteListsCount)
+                if (FavoritesData.CurrentListIndex >= FavoritesData.FavoriteListsCount)
                     FavoritesData.CurrentListIndex = 0;
             }
             EditorGUI.EndDisabledGroup();
-
+            
             if (editNameList)
             {
                 GUI.SetNextControlName("EditNameList");
-                FavoritesData.CurrentList.name = EditorGUILayout.TextField(FavoritesData.CurrentList.name, EditorStyles.toolbarTextField, GUILayout.ExpandWidth(true));
+                FavoritesData.CurrentList.name = EditorGUILayout.TextField(FavoritesData.CurrentList.name, EditorStyles.textField, GUILayout.ExpandWidth(true));
                 EditorGUI.FocusTextInControl("EditNameList");
             }
             else
-                FavoritesData.CurrentListIndex = EditorGUILayout.Popup(FavoritesData.CurrentListIndex, FavoritesData.NameList(), EditorStyles.toolbarPopup);
+            {
+                reorderableList.GrabKeyboardFocus();
+                EditorGUI.BeginDisabledGroup(FavoritesData.FavoriteListsCount == 0);
+                FavoritesData.CurrentListIndex = EditorGUILayout.Popup(FavoritesData.CurrentListIndex, FavoritesData.ListNames(), EditorStyles.toolbarPopup);
+                EditorGUI.EndDisabledGroup();
+            }
 
             if (editNameList && (Event.current.type == EventType.MouseUp && Event.current.button == 0 || Event.current.type == EventType.KeyUp && Event.current.keyCode == KeyCode.Return))
+            {
                 editNameList = false;
+                Repaint();
+                Event.current.Use();
+            }
 
+            EditorGUI.BeginDisabledGroup(FavoritesData.FavoriteListsCount == 0);
             if (GUILayout.Button("", toolbarIconButtonGuiStyle, GUILayout.ExpandWidth(false)))
                 ButtonEditFavoriteList();
+            EditorGUI.EndDisabledGroup();
             
             EditorGUI.BeginDisabledGroup(editNameList);
             if (GUILayout.Button("", toolbarIconButtonGuiStyle, GUILayout.ExpandWidth(false)))
                 ButtonAddFavoriteList();
             EditorGUI.EndDisabledGroup();
             
-            EditorGUI.BeginDisabledGroup(FavoritesData.FavoriteListsCount <= 1);
+            EditorGUI.BeginDisabledGroup(editNameList || FavoritesData.FavoriteListsCount == 0);
             if (GUILayout.Button("", toolbarIconButtonGuiStyle, GUILayout.ExpandWidth(false)))
                 ButtonRemoveFavoriteList();
             EditorGUI.EndDisabledGroup();
 
             GUILayout.EndHorizontal();
 
+            if (FavoritesData.FavoriteListsCount == 0)
+            {
+                EditorGUILayout.Space(20);
+                EditorGUILayout.TextArea("No Favorite Lists found. \nClick the plus button above to create one.", EditorStyles.wordWrappedLabel);
+                GUILayout.EndVertical();
+                return;
+            }
+            
             bool mouseOnWindow = Event.current.mousePosition.x >= 0 && Event.current.mousePosition.x <= position.width && Event.current.mousePosition.y >= 20 && Event.current.mousePosition.y <= position.height;
 
             switch (Event.current.type)
@@ -226,9 +245,9 @@ namespace SmartFavorites
             Selection.activeObject = currentObject;
             if (lastObjectSelected == currentObject)
             {
-                if (lastObjectSelectedAt + _favoritesData.lastObjectSelectedTickOpen > EditorApplication.timeSinceStartup)
+                if (lastObjectSelectedAt + FavoritesData.lastObjectSelectedTickOpen > EditorApplication.timeSinceStartup)
                     AssetDatabase.OpenAsset(currentObject);
-                else if (lastObjectSelectedAt + _favoritesData.lastObjectSelectedTickPing > EditorApplication.timeSinceStartup)
+                else if (lastObjectSelectedAt + FavoritesData.lastObjectSelectedTickPing > EditorApplication.timeSinceStartup)
                     EditorGUIUtility.PingObject(currentObject);
             }
             lastObjectSelected = currentObject;
@@ -269,7 +288,7 @@ namespace SmartFavorites
             if (_favoritesData)
                 return;
             
-            string[] favoriteSaveFind = AssetDatabase.FindAssets("t:FavoriteSave");
+            string[] favoriteSaveFind = AssetDatabase.FindAssets("t:FavoritesData");
             if (favoriteSaveFind.Length > 0)
                 _favoritesData = AssetDatabase.LoadAssetAtPath<FavoritesData>(AssetDatabase.GUIDToAssetPath(favoriteSaveFind[0]));
 
@@ -277,12 +296,12 @@ namespace SmartFavorites
                 return;
                 
             string favoriteSavePath = "";
-            string[] favoriteSavePathFind = AssetDatabase.FindAssets("FavoriteSave t:Script");
+            string[] favoriteSavePathFind = AssetDatabase.FindAssets("FavoritesData t:Script");
             if (favoriteSavePathFind.Length > 0)
-                favoriteSavePath = AssetDatabase.GUIDToAssetPath(favoriteSavePathFind[0].Replace("FavoriteSave.cs", "FavoriteSave.asset"));
+                favoriteSavePath = AssetDatabase.GUIDToAssetPath(favoriteSavePathFind[0].Replace("FavoritesData.cs", "FavoritesData.asset"));
 
-            if (!favoriteSavePath.Contains("FavoriteSave.asset"))
-                favoriteSavePath = "Assets/FavoriteSave.asset";
+            if (!favoriteSavePath.Contains("FavoritesData.asset"))
+                favoriteSavePath = "Assets/FavoritesData.asset";
 
             _favoritesData = CreateInstance<FavoritesData>();
             AssetDatabase.CreateAsset(_favoritesData, favoriteSavePath);
@@ -319,7 +338,7 @@ namespace SmartFavorites
         }
 
         private void ButtonEditFavoriteList() =>
-            editNameList = !editNameList;
+            editNameList = true;
 
         private static void CheckObjects(IEnumerable<Object> objects, out List<GlobalObjectId> addObjects, out List<GlobalObjectId> removeObjects)
         {
