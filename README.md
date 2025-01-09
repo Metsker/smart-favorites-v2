@@ -2,7 +2,7 @@
 
 A favorites panel for Unity to list all your favorites assets in your project
 
-![Favorites Panel for Unity3D]([https://i.imgur.com/ZSp72hC.png])
+![Favorites Panel for Unity3D](https://imgur.com/a/smart-favorites-v2-zGXfpTt)
 
 ## Installation
 
